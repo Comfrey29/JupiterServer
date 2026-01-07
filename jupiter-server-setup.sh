@@ -3,17 +3,17 @@
 # ==============================
 # Jupiter Server Post-Install Script
 # ==============================
-# Autor: Comfrey
-# Funció: Configura el sistema per Jupiter Server
+# Author: ArCom Corporation
+# Purpose: Configure the system for Jupiter Server
 # ==============================
 
 echo "[INFO] Starting Jupiter Server post-installation..."
 
-# 1️⃣ Actualitzar repositoris
+# 1️⃣ Update repositories
 echo "[INFO] Updating package lists..."
 sudo apt update -y
 
-# 2️⃣ Instal·lar paquets essencials
+# 2️⃣ Install essential packages
 echo "[INFO] Installing dependencies..."
 sudo apt install -y \
     python3 python3-pip \
@@ -22,7 +22,7 @@ sudo apt install -y \
     curl wget vim htop \
     openssh-server fail2ban
 
-# 3️⃣ Configuració de SSH segura
+# 3️⃣ Secure SSH configuration
 echo "[INFO] Configuring SSH..."
 sudo systemctl enable ssh
 sudo systemctl start ssh
@@ -33,7 +33,7 @@ sudo sed -i 's/#PasswordAuthentication yes/PasswordAuthentication no/' /etc/ssh/
 sudo sed -i 's/#PermitEmptyPasswords no/PermitEmptyPasswords no/' /etc/ssh/sshd_config
 sudo systemctl restart ssh
 
-# 4️⃣ Configuració MOTD i banner
+# 4️⃣ MOTD and login banner configuration
 echo "[INFO] Setting MOTD..."
 sudo tee /etc/motd > /dev/null <<EOF
 -------------------------------------------------------
@@ -46,27 +46,26 @@ sudo tee /etc/motd > /dev/null <<EOF
 If you need help go to arcom-corporation.onrender.com
 EOF
 
-# Banner abans de login
+# Pre-login SSH banner
 echo "Welcome to Jupiter Server - Authorized Access Only!" | sudo tee /etc/issue.net
 sudo sed -i 's/#Banner none/Banner \/etc\/issue.net/' /etc/ssh/sshd_config
 sudo systemctl restart ssh
 
-# 5️⃣ Configuració Fail2Ban
+# 5️⃣ Fail2Ban configuration
 echo "[INFO] Configuring Fail2Ban..."
 sudo systemctl enable fail2ban
 sudo systemctl start fail2ban
 
-# 6️⃣ Comandes natives i utilitats de control
-echo "[INFO] Utilities like curl, wget, ping, htop are ready."
+# 6️⃣ Native commands and monitoring utilities
+echo "[INFO] Utilities like curl, wget, ping, and htop are ready."
 
-# 7️⃣ Eliminació de GNOME i entorns gràfics
+# 7️⃣ Remove GNOME and desktop environments
 echo "[INFO] Removing GNOME and desktop environments..."
 sudo apt purge -y gnome* ubuntu-desktop kde* x11* lightdm* gdm* sddm*
 sudo apt autoremove -y
 sudo apt clean
 
-# Canviar arrenc per defecte a mode terminal
+# Set default boot target to terminal (no GUI)
 sudo systemctl set-default multi-user.target
 
 echo "[INFO] Jupiter Server post-installation complete!"
-
