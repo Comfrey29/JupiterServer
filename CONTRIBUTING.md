@@ -15,7 +15,7 @@ https://github.com/Comfrey29/JupiterServer
 
 ### 2. **Fork & clone**
 ```bash
-git clone https://github.com/YOUR-USERNAME/JupiterServer.git
+git clone https://github.com/Comfrey29/JupiterServer.git
 cd JupiterServer
 ```
 
@@ -39,7 +39,7 @@ curl -fsSL ./jupiter-server-setup.sh | bash
    - Error exacte + logs
    - Com replicar
 
-**Exemple:**
+**Example:**
 ```
 Tested on: Debian 12.5 amd64 VPS
 Command: curl | bash
@@ -156,7 +156,6 @@ docs(i18n): add Spanish README.es.md
 ## 💬 Need help?
 
 - **Questions**: [Discussions](https://github.com/Comfrey29/JupiterServer/discussions)
-- **Quick chat**: [@Comfrey29](https://x.com/Comfrey29)
 - **Bugs**: [Issues](https://github.com/Comfrey29/JupiterServer/issues/new)
 
 **Your first PR gets a shoutout on Twitter!** 🚀
@@ -168,4 +167,3 @@ docs(i18n): add Spanish README.es.md
 
 ***
 
-**[Copia això a CONTRIBUTING.md]** - Dispararà les primeres contribucions! ⭐
