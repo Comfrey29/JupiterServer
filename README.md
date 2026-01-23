@@ -114,5 +114,3 @@ docker run -d -p 80:80 nginx  # 🎉 Live website!
 2. **Record 30s GIF**: `curl | bash → reboot → docker nginx`
 3. **Post to r/debian**: "5-min script: Fresh Debian → Production Docker server"
 4. **HN Show**: "Show HN: JupiterServer - One bash script for production Debian"
-
-**Copy-paste ready! You'll have stars by tomorrow.** 🎉
