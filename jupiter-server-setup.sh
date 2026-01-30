@@ -91,3 +91,4 @@ sudo usermod -aG docker $USER || true
 echo "[INFO] 🚀 Jupiter Server Enterprise installation complete!"
 echo "     Reboot recommended: sudo reboot"
 echo "     Ready for Docker/Node/Python/Go production workloads"
+
