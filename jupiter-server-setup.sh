@@ -1,71 +1,93 @@
 #!/bin/bash
 
 # ==============================
-# Jupiter Server Post-Install Script
+# Jupiter Server Post-Install Script v2.0
 # ==============================
 # Author: ArCom Corporation
-# Purpose: Configure the system for Jupiter Server
+# Enterprise-grade server hardening + DevOps ready
 # ==============================
 
-echo "[INFO] Starting Jupiter Server post-installation..."
+set -e  # Exit on error
 
-# 1️⃣ Update repositories
-echo "[INFO] Updating package lists..."
-sudo apt update -y
+echo "[INFO] Starting Jupiter Server post-installation v2.0..."
 
-# 2️⃣ Install essential packages
-echo "[INFO] Installing dependencies..."
+# 1️⃣ Update system
+echo "[INFO] Updating repositories..."
+sudo apt update -y && sudo apt upgrade -y
+
+# 2️⃣ Essential packages + enterprise tools
+echo "[INFO] Installing production dependencies..."
 sudo apt install -y \
     python3 python3-pip \
     nodejs npm \
     golang git docker.io \
     curl wget vim htop \
-    openssh-server fail2ban
+    openssh-server fail2ban ufw \
+    walinuxagent cloud-init hyperv-daemons
 
-# 3️⃣ Secure SSH configuration
-echo "[INFO] Configuring SSH..."
-sudo systemctl enable ssh
-sudo systemctl start ssh
+sudo systemctl enable walinuxagent cloud-init --now
 
-sudo sed -i 's/#Port 22/Port 22/' /etc/ssh/sshd_config
-sudo sed -i 's/#PermitRootLogin prohibit-password/PermitRootLogin no/' /etc/ssh/sshd_config
-sudo sed -i 's/#PasswordAuthentication yes/PasswordAuthentication no/' /etc/ssh/sshd_config
-sudo sed -i 's/#PermitEmptyPasswords no/PermitEmptyPasswords no/' /etc/ssh/sshd_config
-sudo systemctl restart ssh
+# 3️⃣ Secure SSH (idempotent)
+echo "[INFO] Hardening SSH configuration..."
+sudo systemctl enable ssh --now
 
-# 4️⃣ MOTD and login banner configuration
-echo "[INFO] Setting MOTD..."
+SSH_CONFIG="/etc/ssh/sshd_config"
+sudo sed -i 's/^#*Port 22$/Port 22/' "$SSH_CONFIG"
+sudo sed -i 's/^#*PermitRootLogin.*/PermitRootLogin no/' "$SSH_CONFIG"
+sudo sed -i 's/^#*PasswordAuthentication.*/PasswordAuthentication no/' "$SSH_CONFIG"
+sudo sed -i 's/^#*PermitEmptyPasswords.*/PermitEmptyPasswords no/' "$SSH_CONFIG"
+
+# 4️⃣ Professional MOTD + banner
+echo "[INFO] Setting enterprise MOTD..."
 sudo tee /etc/motd > /dev/null <<EOF
 -------------------------------------------------------
-                   Debian Jupiter Server
+              🚀 Jupiter Server Enterprise Edition
 -------------------------------------------------------
-                   ArCom Corporation
-                   Based on Debian 13
-                   All rights reserved
+    ArCom Corporation | Production-Ready DevOps Server
+    Docker • Node.js • Python • Go | Fully Hardened
+    Based on Debian 13 | Enterprise Security Standards
 -------------------------------------------------------
-If you need help go to arcom-corporation.onrender.com
+Support: arcom-corporation.onrender.com
 EOF
 
-# Pre-login SSH banner
-echo "Welcome to Jupiter Server - Authorized Access Only!" | sudo tee /etc/issue.net
-sudo sed -i 's/#Banner none/Banner \/etc\/issue.net/' /etc/ssh/sshd_config
+echo "Jupiter Server Enterprise - Authorized Personnel Only" | sudo tee /etc/issue.net
+sudo sed -i 's/^#*Banner.*/Banner \/etc\/issue.net/' "$SSH_CONFIG"
 sudo systemctl restart ssh
 
-# 5️⃣ Fail2Ban configuration
-echo "[INFO] Configuring Fail2Ban..."
-sudo systemctl enable fail2ban
-sudo systemctl start fail2ban
+# 5️⃣ Enterprise security stack
+echo "[INFO] Deploying security stack (UFW + Fail2Ban)..."
+sudo tee /etc/fail2ban/jail.local > /dev/null <<EOF
+[sshd]
+enabled = true
+port = ssh
+filter = sshd
+logpath = /var/log/auth.log
+maxretry = 5
+bantime = 1h
+findtime = 10m
+EOF
 
-# 6️⃣ Native commands and monitoring utilities
-echo "[INFO] Utilities like curl, wget, ping, and htop are ready."
+# Production firewall
+sudo ufw --force enable
+sudo ufw default deny incoming
+sudo ufw default allow outgoing
+sudo ufw allow OpenSSH
+sudo ufw --reload
 
-# 7️⃣ Remove GNOME and desktop environments
-echo "[INFO] Removing GNOME and desktop environments..."
-sudo apt purge -y gnome* ubuntu-desktop kde* x11* lightdm* gdm* sddm*
-sudo apt autoremove -y
-sudo apt clean
+sudo systemctl enable fail2ban --now
+sudo systemctl restart fail2ban
 
-# Set default boot target to terminal (no GUI)
+# 6️⃣ Server optimization (headless)
+echo "[INFO] Optimizing for server workloads..."
+sudo apt purge -y gnome* ubuntu-desktop kde* x11* lightdm* gdm* sddm* || true
+sudo apt autoremove -y && sudo apt clean
 sudo systemctl set-default multi-user.target
 
-echo "[INFO] Jupiter Server post-installation complete!"
+# 7️⃣ Docker optimization
+echo "[INFO] Optimizing Docker for production..."
+sudo systemctl enable docker --now
+sudo usermod -aG docker $USER || true
+
+echo "[INFO] 🚀 Jupiter Server Enterprise installation complete!"
+echo "     Reboot recommended: sudo reboot"
+echo "     Ready for Docker/Node/Python/Go production workloads"
